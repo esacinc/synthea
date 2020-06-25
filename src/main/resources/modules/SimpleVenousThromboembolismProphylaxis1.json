@@ -1,0 +1,4115 @@
+{
+  "name": "SimpleVenousThromboembolismProphylaxis",
+  "remarks": [
+    "Simple Module for Venous Thromboembolism Prophylaxis CMS108"
+  ],
+  "states": {
+    "Initial": {
+      "type": "Initial",
+      "name": "Initial",
+      "distributed_transition": [
+        {
+          "transition": "NonPopulationAge",
+          "distribution": 0.1
+        },
+        {
+          "transition": "PopulationAge",
+          "distribution": 0.9
+        }
+      ]
+    },
+    "Terminal": {
+      "type": "Terminal",
+      "name": "Terminal"
+    },
+    "NonPopulationAge": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Age",
+        "operator": "<",
+        "quantity": 18,
+        "unit": "years",
+        "value": 0
+      },
+      "direct_transition": "Terminal",
+      "name": "NonPopulationAge"
+    },
+    "PopulationAge": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Age",
+        "operator": ">=",
+        "quantity": 18,
+        "unit": "years",
+        "value": 0
+      },
+      "direct_transition": "Qualifying_Encounter",
+      "name": "PopulationAge"
+    },
+    "Observation_for_Thrombin_Levels": {
+      "type": "Observation",
+      "category": "laboratory",
+      "unit": "INR",
+      "codes": [
+        {
+          "system": "LOINC",
+          "code": "34714-6",
+          "display": "INR in Blood by Coagulation assay"
+        }
+      ],
+      "name": "Observation_for_Thrombin_Levels",
+      "range": {
+        "low": 0,
+        "high": 10
+      },
+      "distributed_transition": [
+        {
+          "transition": "High_Risk_for_VTE",
+          "distribution": 0.5
+        },
+        {
+          "transition": "Low_Risk_for_VTE",
+          "distribution": 0.5
+        }
+      ]
+    },
+    "Low_Risk_for_VTE": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Observation",
+        "codes": [
+          {
+            "system": "LOINC",
+            "code": "34714-6",
+            "display": "INR in Blood by Coagulation assay"
+          }
+        ],
+        "operator": ">=",
+        "value": 3
+      },
+      "name": "Low_Risk_for_VTE",
+      "direct_transition": "End_Encounter_VTE"
+    },
+    "High_Risk_for_VTE": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Observation",
+        "codes": [
+          {
+            "system": "LOINC",
+            "code": "34714-6",
+            "display": "INR in Blood by Coagulation"
+          }
+        ],
+        "operator": "<",
+        "value": 3
+      },
+      "name": "High_Risk_for_VTE",
+      "distributed_transition": [
+        {
+          "transition": "VTE_Phrophylaxis_by_Warfarin",
+          "distribution": 0.25
+        },
+        {
+          "transition": "VTE_Prophylaxis_by_Inj_Factor_Xa_Inhib",
+          "distribution": 0.25
+        },
+        {
+          "transition": "VTE_Prophylaxis_by_Low_Mol_Weight_Heparin",
+          "distribution": 0.25
+        },
+        {
+          "transition": "VTE_Prophylaxis_by_Unfractionated_Heparin",
+          "distribution": 0.25
+        }
+      ]
+    },
+    "Encounter_Status": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Attribute",
+        "attribute": "status",
+        "operator": "==",
+        "value": "finished"
+      },
+      "name": "Encounter_Status",
+      "distributed_transition": [
+        {
+          "transition": "VTE_Prophylaxis_by_Unfractionated_Heparin",
+          "distribution": 0.125
+        },
+        {
+          "transition": "VTE_Prophylaxis_by_Low_Mol_Weight_Heparin",
+          "distribution": 0.125
+        },
+        {
+          "transition": "VTE_Prophylaxis_by_Inj_Factor_Xa_Inhib",
+          "distribution": 0.125
+        },
+        {
+          "transition": "VTE_Phrophylaxis_by_Warfarin",
+          "distribution": 0.125
+        },
+        {
+          "transition": "Observation_for_Thrombin_Levels",
+          "distribution": 0.5
+        }
+      ]
+    },
+    "VTE_Phrophylaxis_by_Warfarin": {
+      "type": "MedicationOrder",
+      "codes": [
+        {
+          "system": "RxNorm",
+          "code": 855288,
+          "display": "Warfarin Sodium 1 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855296,
+          "display": "Warfarin Sodium 10 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855302,
+          "display": "Warfarin Sodium 2 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855312,
+          "display": "Warfarin Sodium 2.5 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855318,
+          "display": "Warfarin Sodium 3 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855324,
+          "display": "Warfarin Sodium 4 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855332,
+          "display": "Warfarin Sodium 5 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855338,
+          "display": "Warfarin Sodium 6 MG Oral Tablet"
+        },
+        {
+          "system": "RxNorm",
+          "code": 855344,
+          "display": "Warfarin Sodium 7.5 MG Oral Tablet"
+        }
+      ],
+      "direct_transition": "Medication_Status",
+      "name": "VTE_Phrophylaxis_by_Warfarin",
+      "administration": true
+    },
+    "VTE_Prophylaxis_by_Inj_Factor_Xa_Inhib": {
+      "type": "MedicationOrder",
+      "codes": [
+        {
+          "system": "RxNorm",
+          "code": 861356,
+          "display": "0.8 ML Fondaparinux sodium 12.5 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 861360,
+          "display": "0.5 ML Fondaparinux sodium 5 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 861363,
+          "display": "0.4 ML Fondaparinux sodium 12.5 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 861365,
+          "display": "0.6 ML Fondaparinux sodium 12.5 MG/ML Prefilled Syringe"
+        }
+      ],
+      "name": "VTE_Prophylaxis_by_Inj_Factor_Xa_Inhib",
+      "administration": true,
+      "direct_transition": "Medication_Status"
+    },
+    "VTE_Prophylaxis_by_Unfractionated_Heparin": {
+      "type": "MedicationOrder",
+      "codes": [
+        {
+          "system": "RxNorm",
+          "code": 1361226,
+          "display": "heparin sodium, porcine 1000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1361568,
+          "display": "5 ML heparin sodium, porcine 2000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1361574,
+          "display": "heparin sodium, porcine 20000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1361577,
+          "display": "10 ML heparin sodium, porcine 2500 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1361615,
+          "display": "heparin sodium, porcine 5000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1361853,
+          "display": "0.5 ML heparin sodium, porcine 10000 UNT/ML Cartridge"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1362831,
+          "display": "heparin sodium, porcine 10000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1658634,
+          "display": "0.5 ML heparin sodium, porcine 10000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1658637,
+          "display": "1 ML heparin sodium, porcine 10000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1658647,
+          "display": "2 ML heparin sodium, porcine 1000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1658659,
+          "display": "1 ML heparin sodium, porcine 1000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1659260,
+          "display": "1 ML heparin sodium, porcine 5000 UNT/ML Cartridge"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1659263,
+          "display": "1 ML heparin sodium, porcine 5000 UNT/ML Injection"
+        },
+        {
+          "system": "RxNorm",
+          "code": 1798389,
+          "display": "1 ML heparin sodium, porcine 5000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 2121591,
+          "display": "0.5 ML heparin sodium, porcine 10000 UNT/ML Prefilled Syringe"
+        }
+      ],
+      "name": "VTE_Prophylaxis_by_Unfractionated_Heparin",
+      "administration": true,
+      "distributed_transition": [
+        {
+          "transition": "Medication_Status",
+          "distribution": 0.1
+        },
+        {
+          "transition": "Dosage_Route",
+          "distribution": 0.9
+        }
+      ]
+    },
+    "VTE_Prophylaxis_by_Low_Mol_Weight_Heparin": {
+      "type": "MedicationOrder",
+      "codes": [
+        {
+          "system": "RxNorm",
+          "code": 854228,
+          "display": "0.3 ML Enoxaparin sodium 100 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854235,
+          "display": "0.4 ML Enoxaparin sodium 100 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854238,
+          "display": "0.6 ML Enoxaparin sodium 100 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854241,
+          "display": "0.8 ML Enoxaparin sodium 100 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854245,
+          "display": "0.8 ML Enoxaparin sodium 150 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854248,
+          "display": "1 ML Enoxaparin sodium 100 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854252,
+          "display": "1 ML Enoxaparin sodium 150 MG/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 854255,
+          "display": "Enoxaparin sodium 100 MG/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978713,
+          "display": "Tinzaparin sodium 20000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978725,
+          "display": "0.2 ML Dalteparin Sodium 12500 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978733,
+          "display": "0.2 ML Dalteparin Sodium 25000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978736,
+          "display": "0.3 ML Dalteparin Sodium 25000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978740,
+          "display": "0.5 ML Dalteparin Sodium 25000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978744,
+          "display": "0.6 ML Dalteparin Sodium 25000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978746,
+          "display": "0.72 ML Dalteparin Sodium 25000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978755,
+          "display": "1 ML Dalteparin Sodium 10000 UNT/ML Prefilled Syringe"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978759,
+          "display": "Dalteparin Sodium 10000 UNT/ML Injectable Solution"
+        },
+        {
+          "system": "RxNorm",
+          "code": 978777,
+          "display": "Dalteparin Sodium 25000 UNT/ML Injectable Solution"
+        }
+      ],
+      "name": "VTE_Prophylaxis_by_Low_Mol_Weight_Heparin",
+      "administration": true,
+      "direct_transition": "Medication_Status"
+    },
+    "Dosage_Route": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Attribute",
+        "attribute": "dosage.route",
+        "operator": "==",
+        "value": "Subcutaneous route"
+      },
+      "name": "Dosage_Route",
+      "direct_transition": "Medication_Status"
+    },
+    "Medication_Status": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Attribute",
+        "attribute": "status",
+        "operator": "==",
+        "value": "completed"
+      },
+      "name": "Medication_Status",
+      "direct_transition": "End_Encounter_VTE"
+    },
+    "End_Encounter_VTE": {
+      "type": "EncounterEnd",
+      "name": "End_Encounter_VTE",
+      "distributed_transition": [
+        {
+          "transition": "Qualifying_Encounter",
+          "distribution": 0.5
+        },
+        {
+          "transition": "Terminal",
+          "distribution": 0.5
+        }
+      ]
+    },
+    "Encounter_Period": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "And",
+        "conditions": [
+          {
+            "condition_type": "Attribute",
+            "attribute": "period",
+            "operator": ">=",
+            "unit": "days",
+            "value": 2
+          },
+          {
+            "condition_type": "Attribute",
+            "attribute": "period",
+            "operator": "<=",
+            "unit": "days",
+            "value": 120
+          }
+        ]
+      },
+      "direct_transition": "Encounter_Status",
+      "name": "Encounter_Period"
+    },
+    "NonQualifying_Stroke": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "",
+      "target_encounter": "text",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 195155004,
+          "display": "Subarachnoid hemorrhage from carotid siphon and bifurcation (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 195160000,
+          "display": "Intracranial subarachnoid hemorrhage from vertebral artery (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 195165005,
+          "display": "Basal ganglia hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 195167002,
+          "display": "External capsule hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 195168007,
+          "display": "Intracerebral hemorrhage with intraventricular hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 195169004,
+          "display": "Intracerebral hemorrhage, multiple localized (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 20908003,
+          "display": "Subcortical cerebral hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230706003,
+          "display": "Hemorrhagic cerebral infarction (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230707007,
+          "display": "Anterior cerebral circulation hemorrhagic infarction (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230708002,
+          "display": "Posterior cerebral circulation hemorrhagic infarction (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230709005,
+          "display": "Massive supratentorial cerebral hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230710000,
+          "display": "Lobar cerebral hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230711001,
+          "display": "Thalamic hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 230712008,
+          "display": "Lacunar hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 23276006,
+          "display": "Ventricular hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 270907008,
+          "display": "Spontaneous intracranial subarachnoid hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 274100004,
+          "display": "Cerebral hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276277008,
+          "display": "Subarachnoid hemorrhage from multiple aneurysms (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276278003,
+          "display": "Subarachnoid hemorrhage from anterior cerebral artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276280009,
+          "display": "Subarachnoid hemorrhage from middle cerebral artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276281008,
+          "display": "Subarachnoid hemorrhage from posterior cerebral artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276282001,
+          "display": "Subarachnoid hemorrhage from anterior communicating artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276283006,
+          "display": "Subarachnoid hemorrhage from posterior communicating artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276284000,
+          "display": "Subarachnoid hemorrhage from basilar artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276285004,
+          "display": "Subarachnoid hemorrhage from posterior inferior cerebellar artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276286003,
+          "display": "Subarachnoid hemorrhage from carotid artery aneurysm (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 276722003,
+          "display": "Intracerebellar and posterior fossa hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 28318001,
+          "display": "Basilar hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 42429001,
+          "display": "Cerebromeningeal hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 425957003,
+          "display": "Non-traumatic intracerebral ventricular hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 449020009,
+          "display": "Intraparenchymal hemorrhage of brain (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 49422009,
+          "display": "Cortical hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 52201006,
+          "display": "Internal capsule hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 73020009,
+          "display": "Cerebral hemisphere hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 75038005,
+          "display": "Cerebellar hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 7713009,
+          "display": "Intrapontine hemorrhage (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 95454007,
+          "display": "Brain stem hemorrhage (disorder)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "name": "NonQualifying_Stroke"
+    },
+    "Admission_without_Venous_Thromboembolism": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Not",
+        "condition": {
+          "condition_type": "Or",
+          "conditions": [
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1001000119102,
+                  "display": "Pulmonary embolism with pulmonary infarction (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11029002,
+                  "display": "Pulmonary apoplexy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 128053003,
+                  "display": "Deep venous thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 128055005,
+                  "display": "Deep venous thrombosis of pelvic vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 132251000119101,
+                  "display": "Acute deep venous thrombosis of popliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 132291000119106,
+                  "display": "Acute deep venous thrombosis of femoral vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 132301000119107,
+                  "display": "Acute deep venous thrombosis of ileofemoral vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 134399007,
+                  "display": "Deep vein thrombosis of leg related to air travel (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16750002,
+                  "display": "Deep thrombophlebitis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1748006,
+                  "display": "Thrombophlebitis of deep femoral vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 194883006,
+                  "display": "Postoperative pulmonary embolus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195394007,
+                  "display": "Phlebitis and thrombophlebitis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195405004,
+                  "display": "Phlebitis of popliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195408002,
+                  "display": "Phlebitis of the posterior tibial vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195410000,
+                  "display": "Thrombophlebitis of the femoral vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195411001,
+                  "display": "Thrombophlebitis of the popliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195421009,
+                  "display": "Phlebitis of the common iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195422002,
+                  "display": "Phlebitis of the internal iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195423007,
+                  "display": "Phlebitis of the external iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195425000,
+                  "display": "Thrombophlebitis of the common iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195426004,
+                  "display": "Thrombophlebitis of the internal iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195427008,
+                  "display": "Thrombophlebitis of the external iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 195437003,
+                  "display": "Embolism and thrombosis of the vena cava (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 213220000,
+                  "display": "Postoperative deep vein thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 233935004,
+                  "display": "Pulmonary thromboembolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 233936003,
+                  "display": "Acute massive pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 234044007,
+                  "display": "Ileofemoral deep vein thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 234049002,
+                  "display": "Venous embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 25114006,
+                  "display": "Phlebitis of deep veins of lower extremity (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 266267005,
+                  "display": "Deep vein phlebitis and thrombophlebitis of the leg (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 276494008,
+                  "display": "Phlebitis and/or thrombophlebitis of iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 281595001,
+                  "display": "Thrombosis of inferior vena cava (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 312584000,
+                  "display": "Thrombosis of vein of trunk (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 312588002,
+                  "display": "Phlebitis of lower limb vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 31295000,
+                  "display": "Phlebitis of iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 35979000,
+                  "display": "Phlebitis of femoropopliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 40198004,
+                  "display": "Thrombophlebitis of deep veins of lower extremity (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 404223003,
+                  "display": "Deep venous thrombosis of lower extremity (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 413956008,
+                  "display": "Deep vein thrombosis of leg related to intravenous drug use (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 427775006,
+                  "display": "Deep venous thrombosis of profunda femoris vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 427776007,
+                  "display": "Thrombosis of the popliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 42861008,
+                  "display": "Thrombophlebitis of iliac vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 429098002,
+                  "display": "Thromboembolism of vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 441746000,
+                  "display": "Infarction of lung due to iatrogenic pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 444325005,
+                  "display": "Deep vein thrombosis of bilateral lower extremities (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 46253008,
+                  "display": "Thrombophlebitis of lower extremities (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 50817002,
+                  "display": "Embolism of vena cava (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 52496006,
+                  "display": "Thrombophlebitis of femoropopliteal vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 57834008,
+                  "display": "Pulmonary artery thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 58309001,
+                  "display": "Phlebitis of tibial vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 59282003,
+                  "display": "Pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 64662007,
+                  "display": "Pulmonary infarction (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 69357003,
+                  "display": "Pulmonary thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 7387004,
+                  "display": "Thrombophlebitis of tibial vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 74315008,
+                  "display": "Pulmonary microemboli (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 77892009,
+                  "display": "Pulmonary venous thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 83727005,
+                  "display": "Hemorrhagic pulmonary infarction (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 83938003,
+                  "display": "Thrombosis of vena cava (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 95448006,
+                  "display": "Thrombosis of pelvic vein (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 95449003,
+                  "display": "Thrombophlebitis of pelvic vein (disorder)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "name": "Admission_without_Venous_Thromboembolism",
+      "direct_transition": "Encounter_Period"
+    },
+    "Admission_without_Obstetrics_VTE": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Not",
+        "condition": {
+          "condition_type": "Or",
+          "conditions": [
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 13943000,
+                  "display": "Failed attempted abortion complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 19363005,
+                  "display": "Failed attempted abortion with blood-clot embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 198876008,
+                  "display": "Failed medical abortion, complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200232006,
+                  "display": "Antenatal deep vein thrombosis - delivered (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200233001,
+                  "display": "Antenatal deep vein thrombosis with antenatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200237000,
+                  "display": "Postnatal deep vein thrombosis - delivered with postnatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200238005,
+                  "display": "Postnatal deep vein thrombosis with postnatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200284000,
+                  "display": "Obstetric pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200299000,
+                  "display": "Obstetric blood-clot pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200301007,
+                  "display": "Obstetric blood-clot pulmonary embolism - delivered (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200302000,
+                  "display": "Obstetric blood-clot pulmonary embolism - delivered with postnatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200303005,
+                  "display": "Obstetric blood-clot pulmonary embolism with antenatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 200304004,
+                  "display": "Obstetric blood-clot pulmonary embolism with postnatal complication (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 21604008,
+                  "display": "Illegal abortion with blood-clot embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 267280004,
+                  "display": "Venous complication of pregnancy and/or the puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 26743002,
+                  "display": "Illegal abortion complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 280966008,
+                  "display": "Phlegmasia alba dolens - obstetric (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 37787009,
+                  "display": "Legal abortion with blood-clot embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 43306002,
+                  "display": "Miscarriage complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 49956009,
+                  "display": "Antepartum deep phlebothrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 51096002,
+                  "display": "Legal abortion with pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 55589000,
+                  "display": "Illegal abortion with pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 55976003,
+                  "display": "Miscarriage with blood-clot embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 56272000,
+                  "display": "Postpartum deep phlebothrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 56462001,
+                  "display": "Failed attempted abortion with soap embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 57734001,
+                  "display": "Legal abortion complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 58123006,
+                  "display": "Failed attempted abortion with pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 609497003,
+                  "display": "Venous complication in the puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 62583006,
+                  "display": "Puerperal phlegmasia alba dolens (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 63795001,
+                  "display": "Thrombosis of intracranial venous sinus of pregnancy AND/OR puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 663008,
+                  "display": "Pulmonary embolism following molar AND/OR ectopic pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 82153002,
+                  "display": "Miscarriage with pulmonary embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 84216001,
+                  "display": "Cerebral venous thrombosis of pregnancy AND/OR puerperium (disorder)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "name": "Admission_without_Obstetrics_VTE",
+      "direct_transition": "Admission_without_Venous_Thromboembolism"
+    },
+    "NonQualifying_Procedure_Status": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Attribute",
+        "attribute": "status",
+        "operator": "==",
+        "value": "completed"
+      },
+      "direct_transition": "Terminal",
+      "name": "NonQualifying_Procedure_Status"
+    },
+    "NonQualifying_Mental_Health": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "",
+      "target_encounter": "text",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 101421000119107,
+          "display": "Dementia due to Parkinson’s disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10211000132109,
+          "display": "Perinatal depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10278007,
+          "display": "Factitious purpura (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10327003,
+          "display": "Cocaine-induced mood disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10349009,
+          "display": "Multi-infarct dementia with delirium (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 104851000119103,
+          "display": "Postpartum major depression in remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10532003,
+          "display": "Primary degenerative dementia of the Alzheimer type, presenile onset, with depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 105421000119105,
+          "display": "Early onset Alzheimer’s disease with behavioral disturbance (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10586006,
+          "display": "Occupation-related stress disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 106021000119105,
+          "display": "Multi-infarct dementia due to atherosclerosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10743001000119104,
+          "display": "Anxiety disorder in mother complicating childbirth (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10760421000119102,
+          "display": "Psychotic disorder in mother complicating childbirth (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10760461000119108,
+          "display": "Psychotic disorder in mother complicating pregnancy (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10783000,
+          "display": "Symptomatic pedophilia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10811121000119102,
+          "display": "Major depressive disorder in mother complicating childbirth (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10811161000119108,
+          "display": "Major depressive disorder in mother complicating pregnancy (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10835871000119104,
+          "display": "Depressive disorder in mother complicating childbirth (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10875004,
+          "display": "Severe mixed bipolar I disorder with psychotic features, mood-incongruent (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 109006,
+          "display": "Anxiety disorder of childhood OR adolescence (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 109805003,
+          "display": "Factitious cheilitis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10981006,
+          "display": "Severe mixed bipolar I disorder with psychotic features (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 109956006,
+          "display": "Psychogenic purpura (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111477005,
+          "display": "Reactive attachment disorder of infancy OR early childhood, disinhibited type (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111480006,
+          "display": "Psychoactive substance-induced organic dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111482003,
+          "display": "Subchronic schizophrenia with acute exacerbations (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111483008,
+          "display": "Catatonic schizophrenia in remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111484002,
+          "display": "Undifferentiated schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111485001,
+          "display": "Mixed bipolar I disorder in full remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111486000,
+          "display": "Symptomatic sexual sadism (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111487009,
+          "display": "Dream anxiety disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111490003,
+          "display": "Panic disorder with agoraphobia, agoraphobic avoidance in partial remission AND severe panic attacks (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111491004,
+          "display": "Panic disorder with agoraphobia, agoraphobic avoidance in full remission AND panic attacks in partial remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 111492006,
+          "display": "Conversion disorder, single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1145003,
+          "display": "Developmental speech disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11806006,
+          "display": "Separation anxiety disorder of childhood (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11941006,
+          "display": "Panic disorder with agoraphobia, agoraphobic avoidance in full remission AND panic attacks in full remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1196001,
+          "display": "Chronic bipolar II disorder, most recent episode major depressive (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12277671000119108,
+          "display": "Gender dysphoria in childhood (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12277711000119108,
+          "display": "Gender dysphoria in adolescence and adulthood (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12348006,
+          "display": "Presenile dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12367551000119100,
+          "display": "Developmental delay of fine motor function (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 126943008,
+          "display": "Separation anxiety (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12939007,
+          "display": "Chronic disorganized schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 129562004,
+          "display": "Psychogenic skin disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 129602009,
+          "display": "Symbiotic infantile psychosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 129604005,
+          "display": "Delusion of heart disease syndrome (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 129605006,
+          "display": "Postgastrectomy neurosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 129606007,
+          "display": "Frontal lobe syndrome (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12969000,
+          "display": "Severe bipolar II disorder, most recent episode major depressive, in full remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 130121000119104,
+          "display": "Dementia due to Rett’s syndrome (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 133091000119105,
+          "display": "Rapid cycling bipolar I disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 133121000119109,
+          "display": "Severe seasonal affective disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13313007,
+          "display": "Mild bipolar disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 133991000119109,
+          "display": "Fluency disorder as sequela of cerebrovascular disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13438001,
+          "display": "Overanxious disorder of childhood (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13581000,
+          "display": "Severe bipolar I disorder, single manic episode with psychotic features, mood-congruent (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13601005,
+          "display": "Paranoid personality disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13670005,
+          "display": "Gender identity disorder of adulthood, previously heterosexual (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13746004,
+          "display": "Bipolar disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1376001,
+          "display": "Obsessive compulsive personality disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1380006,
+          "display": "Agoraphobia without history of panic disorder with limited symptom attacks (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1383008,
+          "display": "Hallucinogen mood disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14070001,
+          "display": "Multi-infarct dementia with depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14077003,
+          "display": "Pica (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14144000,
+          "display": "Erotomanic delusion disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14183003,
+          "display": "Chronic major depressive disorder, single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 141991000119109,
+          "display": "Delusions in Alzheimer’s disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 142001000119106,
+          "display": "Depressed mood in Alzheimer’s disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 142011000119109,
+          "display": "Alzheimer’s disease co-occurrent with delirium (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14291003,
+          "display": "Subchronic disorganized schizophrenia with acute exacerbations (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14495005,
+          "display": "Severe bipolar I disorder, single manic episode without psychotic features (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1499003,
+          "display": "Bipolar I disorder, single manic episode with postpartum onset (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15193003,
+          "display": "Severe recurrent major depression with psychotic features, mood-incongruent (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 153071000119108,
+          "display": "Recurrent manic episodes in partial remission (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15639000,
+          "display": "Moderate major depression, single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15662003,
+          "display": "Senile dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1581000119101,
+          "display": "Dementia of the Alzheimer type with behavioral disturbance (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15840001,
+          "display": "Symptomatic fetishism (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1591000119103,
+          "display": "Dementia with behavioral disturbance (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15921731000119106,
+          "display": "Psychotic disorder caused by methamphetamine (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15945005,
+          "display": "Psychogenic polydipsia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15977008,
+          "display": "Adjustment disorder with academic inhibition (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 162004,
+          "display": "Severe manic bipolar I disorder without psychotic features (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16219201000119100,
+          "display": "Behavioral disturbance co-occurrent and due to late onset Alzheimer dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 162218007,
+          "display": "Stress-related problem (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 162313000,
+          "display": "Morbid jealousy (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16265701000119108,
+          "display": "Illness anxiety disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16265951000119108,
+          "display": "Mild major depressive disorder co-occurrent with anxiety single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16266831000119100,
+          "display": "Moderate major depressive disorder co-occurrent with anxiety single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16266991000119108,
+          "display": "Severe major depressive disorder co-occurrent with anxiety single episode (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 162722001,
+          "display": "On examination - depressed (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16276361000119108,
+          "display": "Vascular dementia without behavioral disturbance (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16295005,
+          "display": "Bipolar II disorder, most recent episode major depressive (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16506000,
+          "display": "Mixed bipolar I disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16805009,
+          "display": "Cluster A personality disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1686006,
+          "display": "Sedative, hypnotic AND/OR anxiolytic-induced anxiety disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16966009,
+          "display": "Factitious hypoglycemia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16990005,
+          "display": "Subchronic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17155009,
+          "display": "Trichotillomania (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17226007,
+          "display": "Adjustment disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17262008,
+          "display": "Non-alcoholic Korsakoff’s psychosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1740001000004102,
+          "display": "Iatrogenic thyrotoxicosis factitia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17496003,
+          "display": "Organic anxiety disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17782008,
+          "display": "Bipolar I disorder, most recent episode manic with catatonic features (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 17961008,
+          "display": "Conduct disorder, childhood-onset type (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18003009,
+          "display": "Gender identity disorder of adulthood (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18085000,
+          "display": "Compulsive gambling (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1816003,
+          "display": "Panic disorder with agoraphobia, severe agoraphobic avoidance AND mild panic attacks (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18186001,
+          "display": "True compulsive fetishism (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18193002,
+          "display": "Hypochondriasis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18260003,
+          "display": "Postpartum psychosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18393005,
+          "display": "Undifferentiated somatoform disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18478005,
+          "display": "Adjustment disorder with physical complaints (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1855002,
+          "display": "Developmental academic disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18573003,
+          "display": "Obsessional erotomania (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 187921002,
+          "display": "Developmental receptive language disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18818009,
+          "display": "Moderate recurrent major depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 18941000,
+          "display": "Oppositional defiant disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191447007,
+          "display": "Organic psychotic condition (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191449005,
+          "display": "Uncomplicated senile dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191451009,
+          "display": "Uncomplicated presenile dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191452002,
+          "display": "Presenile dementia with delirium (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191454001,
+          "display": "Presenile dementia with paranoia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191455000,
+          "display": "Presenile dementia with depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191457008,
+          "display": "Senile dementia with depressive or paranoid features (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191458003,
+          "display": "Senile dementia with paranoia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191459006,
+          "display": "Senile dementia with depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191461002,
+          "display": "Senile dementia with delirium (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191463004,
+          "display": "Uncomplicated arteriosclerotic dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191464005,
+          "display": "Arteriosclerotic dementia with delirium (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191465006,
+          "display": "Arteriosclerotic dementia with paranoia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191466007,
+          "display": "Arteriosclerotic dementia with depression (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191471000,
+          "display": "Korsakov’s alcoholic psychosis with peripheral neuritis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191478006,
+          "display": "Alcoholic paranoia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191483003,
+          "display": "Drug-induced psychosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191484009,
+          "display": "Drug-induced paranoia or hallucinatory states (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191485005,
+          "display": "Drug-induced paranoid state (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191486006,
+          "display": "Drug-induced hallucinosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191493005,
+          "display": "Drug-induced dementia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191494004,
+          "display": "Drug-induced amnestic syndrome (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191495003,
+          "display": "Drug-induced depressive state (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191496002,
+          "display": "Drug-induced personality disorder (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191499009,
+          "display": "Transient organic psychoses (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191519005,
+          "display": "Dementia associated with another disease (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191525009,
+          "display": "Non-organic psychosis (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191526005,
+          "display": "Schizophrenic disorders (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191527001,
+          "display": "Simple schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191530008,
+          "display": "Acute exacerbation of subchronic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191531007,
+          "display": "Acute exacerbation of chronic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191538001,
+          "display": "Acute exacerbation of subchronic hebephrenic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191539009,
+          "display": "Acute exacerbation of chronic hebephrenic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191542003,
+          "display": "Catatonic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191547009,
+          "display": "Acute exacerbation of subchronic catatonic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191548004,
+          "display": "Acute exacerbation of chronic catatonic schizophrenia (disorder)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 191554003,
+          "display": "Acute exacerbation of subchronic paranoid schizophrenia (disorder)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "name": "NonQualifying_Mental_Health"
+    },
+    "Admission_without_Obstetrics": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Not",
+        "condition": {
+          "condition_type": "Or",
+          "conditions": [
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10217006,
+                  "display": "Third degree perineal laceration (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 102882004,
+                  "display": "Abnormal placental secretion of chorionic gonadotropin (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 102885002,
+                  "display": "Absence of placental secretion of chorionic gonadotropin (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10562009,
+                  "display": "Malignant hypertension complicating AND/OR reason for care during childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10573002,
+                  "display": "Infection of amniotic cavity (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106004004,
+                  "display": "Hemorrhagic complication of pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106005003,
+                  "display": "Hypertension AND/OR vomiting complicating pregnancy childbirth AND/OR puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106007006,
+                  "display": "Maternal AND/OR fetal condition affecting labor AND/OR delivery (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106008001,
+                  "display": "Delivery AND/OR maternal condition affecting management (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106009009,
+                  "display": "Fetal condition affecting obstetrical care of mother (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106010004,
+                  "display": "Pelvic dystocia AND/OR uterine disorder (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 106011000,
+                  "display": "Condition of fetal growth AND/OR malnutrition (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10742471000119108,
+                  "display": "Previous bariatric surgery in mother complicating childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10743831000119100,
+                  "display": "Neoplasm of uterus affecting pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10749641000119106,
+                  "display": "Blood coagulation disorder complicating pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10749691000119104,
+                  "display": "Obstetric anesthesia with cardiac complication in childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10749811000119108,
+                  "display": "Obstetric anesthesia with central nervous system complication in childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10750551000119100,
+                  "display": "Obesity in mother complicating childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10752771000119100,
+                  "display": "Renal failure after ectopic pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10756101000119108,
+                  "display": "Group B streptococcus infection in mother complicating childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10756301000119104,
+                  "display": "Physical abuse complicating pregnancy (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10759231000119102,
+                  "display": "Salpingo-oophoritis in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10759841000119104,
+                  "display": "Sexually transmitted infectious disease in mother complicating childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10759961000119102,
+                  "display": "Viral disease in mother complicating childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10760341000119100,
+                  "display": "Retraction of nipple in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10760981000119108,
+                  "display": "Psychological abuse complicating pregnancy (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10761061000119108,
+                  "display": "Sexual abuse complicating pregnancy (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10835971000119108,
+                  "display": "Anti-A sensitization in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10853001,
+                  "display": "Obstetrical complication of general anesthesia (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 10884004,
+                  "display": "Threatened abortion in third trimester (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109562007,
+                  "display": "Abnormal chorion (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109891004,
+                  "display": "Detached products of conception (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109892006,
+                  "display": "Detached chorionic villi (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109893001,
+                  "display": "Detached trophoblast (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109894007,
+                  "display": "Retained placenta (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 109895008,
+                  "display": "Retained placental fragment (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111208003,
+                  "display": "Melasma gravidarum (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111365004,
+                  "display": "Funicular indirect inguinal hernia (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111425004,
+                  "display": "Genital tract AND/OR pelvic infection following molar AND/OR ectopic pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111431001,
+                  "display": "Legal abortion complicated by damage to pelvic organs AND/OR tissues (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111432008,
+                  "display": "Legal abortion with air embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111438007,
+                  "display": "Hypertension secondary to renal disease in obstetric context (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111440002,
+                  "display": "Conjoined twins causing disproportion (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111447004,
+                  "display": "Placental condition affecting management of mother (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111451002,
+                  "display": "Obstetrical injury to pelvic organ (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111452009,
+                  "display": "Postpartum afibrinogenemia with hemorrhage (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111453004,
+                  "display": "Retained placenta, without hemorrhage (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111454005,
+                  "display": "Retained portions of placenta AND/OR membranes without hemorrhage (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111458008,
+                  "display": "Postpartum venous thrombosis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 111459000,
+                  "display": "Infection of nipple, associated with childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 112073004,
+                  "display": "Right sacroposterior position (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11209007,
+                  "display": "Cord entanglement without compression (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11246006,
+                  "display": "Brow left anterior position (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1125006,
+                  "display": "Sepsis during labor (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11454006,
+                  "display": "Failed attempted abortion with amniotic fluid embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11612004,
+                  "display": "Chorioamnionitis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11618000,
+                  "display": "Intra-amniotic infection of fetus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11669000,
+                  "display": "Postoperative shock following molar AND/OR ectopic pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11687002,
+                  "display": "Gestational diabetes mellitus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11763009,
+                  "display": "Placenta increta (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11914001,
+                  "display": "Transverse OR oblique presentation of fetus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 11942004,
+                  "display": "Perineal laceration involving pelvic floor (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 12095001,
+                  "display": "Legal abortion with cardiac arrest AND/OR failure (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 123667006,
+                  "display": "Abnormal mature chorion (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 124736009,
+                  "display": "Compound presentation (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 125586008,
+                  "display": "Disorder of placenta (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 12729009,
+                  "display": "Prolonged rupture of membranes (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 128076000,
+                  "display": "Bone AND/OR joint disorder in mother complicating pregnancy, childbirth AND/OR puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 128077009,
+                  "display": "Trauma to vagina during delivery (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 12867002,
+                  "display": "Fetal distress affecting management of mother (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 129597002,
+                  "display": "Moderate hyperemesis gravidarum (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 129598007,
+                  "display": "Severe hyperemesis gravidarum (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 12983003,
+                  "display": "Failed attempted abortion with septic shock (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 130958001,
+                  "display": "Disorder of placental circulatory function (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1343000,
+                  "display": "Deep transverse arrest (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 13842006,
+                  "display": "Sub-involution of uterus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 13866000,
+                  "display": "Fetal acidemia affecting management of mother (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 13943000,
+                  "display": "Failed attempted abortion complicated by embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 14022007,
+                  "display": "Fetal death, affecting management of mother (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 14094001,
+                  "display": "Excessive vomiting in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1474004,
+                  "display": "Hypertensive heart AND renal disease complicating AND/OR reason for care during childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 14918004,
+                  "display": "Disruption of perineal wound in the puerperium (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15196006,
+                  "display": "Intraplacental hematoma (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15230009,
+                  "display": "Liver disorder in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1538006,
+                  "display": "Central nervous system malformation in fetus affecting obstetrical care (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15394000,
+                  "display": "Toxemia of pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15400003,
+                  "display": "Obstetrical air embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15406009,
+                  "display": "Retromammary abscess associated with childbirth (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15504009,
+                  "display": "Rupture of gravid uterus (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15539009,
+                  "display": "Hydrops fetalis due to isoimmunization (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15663008,
+                  "display": "Placenta previa centralis (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15692007,
+                  "display": "Right lateral brow position (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1592005,
+                  "display": "Failed attempted abortion with uremia (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 15938005,
+                  "display": "Eclampsia (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16083003,
+                  "display": "Damage to pelvic organs AND/OR tissues following molar AND/OR ectopic pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1621000119101,
+                  "display": "Chlamydia trachomatis infection in pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 163515002,
+                  "display": "On examination - oblique lie (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 163516001,
+                  "display": "On examination - transverse lie (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 1639007,
+                  "display": "Abnormality of organs AND/OR soft tissues of pelvis affecting pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16574001,
+                  "display": "Cardiac arrest after obstetrical surgery AND/OR other procedure including delivery (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16607004,
+                  "display": "Missed abortion (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16756008,
+                  "display": "Albuminuria in pregnancy without hypertension (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 16950007,
+                  "display": "Fourth degree perineal laceration involving anal mucosa (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 169581008,
+                  "display": "Antenatal care: grand multiparity (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 169593004,
+                  "display": "Antenatal care: poor antenatal attender (finding)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 169958000,
+                  "display": "Placenta incomplete (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 171000119107,
+                  "display": "Maternal obesity complicating pregnancy, childbirth and the puerperium, antepartum (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 17263003,
+                  "display": "Amniotic fluid embolism (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 173300003,
+                  "display": "Disorder of pregnancy (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 17380002,
+                  "display": "Failed attempted abortion with acute renal failure (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 17382005,
+                  "display": "Cervical incompetence (disorder)"
+                }
+              ]
+            },
+            {
+              "condition_type": "Active Condition",
+              "codes": [
+                {
+                  "system": "SNOMED-CT",
+                  "code": 17433009,
+                  "display": "Ruptured ectopic pregnancy (disorder)"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "direct_transition": "Admission_without_Obstetrics_VTE",
+      "name": "Admission_without_Obstetrics"
+    },
+    "NonQualifying_Surgery": {
+      "type": "Procedure",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 10002003,
+          "display": "Resection of stomach fundus (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10107006,
+          "display": "Duodenoduodenostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10254002,
+          "display": "Excision of diverticulum of small intestine (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10259007,
+          "display": "Proctopexy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10272008,
+          "display": "Closure of fistula of diaphragm (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10388006,
+          "display": "Manipulation of tissue of diaphragm (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1054002,
+          "display": "Incision of sphincter of Oddi (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10590008,
+          "display": "Fulguration of lesion of large intestine (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 107938000,
+          "display": "Small intestine excision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 107944001,
+          "display": "Large intestine excision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 108184008,
+          "display": "Diaphragm excision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10869008,
+          "display": "Hemigastrectomy with vagotomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 10985002,
+          "display": "Gallbladder to intestine anastomosis (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11127003,
+          "display": "Esophagogastrostomy, antesternal or antethoracic (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11236009,
+          "display": "Near-total pancreatectomy with preservation of duodenum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112860004,
+          "display": "Hemigastrectomy by abdominal approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112864008,
+          "display": "Incision and exploration of jejunum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112871003,
+          "display": "Enteroanastomosis large-to-large intestine (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112873000,
+          "display": "Closure of perineosigmoidal fistula (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112875007,
+          "display": "Removal of foreign body of rectum by incision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112877004,
+          "display": "Frickman operation, abdominal proctopexy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112883001,
+          "display": "Removal of foreign body from liver (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112884007,
+          "display": "Cholecystoduodenostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112977000,
+          "display": "Repair of diaphragmatic hernia (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 112982007,
+          "display": "Lysis of adhesions of stomach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11574002,
+          "display": "Creation of endorectal ileal H-pouch with anastomosis to anus (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116026007,
+          "display": "Total jejunectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116027003,
+          "display": "Partial jejunectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116031009,
+          "display": "Pylorus-sparing Whipple operation (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116165008,
+          "display": "Bronchial sleeve resection with pulmonary resection (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116175006,
+          "display": "Proximal subtotal gastrectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116215005,
+          "display": "Proximal subtotal pancreatectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116241004,
+          "display": "Pancreaticoduodenectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 116242006,
+          "display": "Pylorus-sparing pancreaticoduodenectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11626008,
+          "display": "Miles operation, complete proctectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 11682008,
+          "display": "Jejunoileostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119288004,
+          "display": "Excision of ampulla of Vater (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119746007,
+          "display": "Lung excision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119879002,
+          "display": "Esophagus closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119880004,
+          "display": "Esophagus reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119883002,
+          "display": "Stomach closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119884008,
+          "display": "Stomach reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119887001,
+          "display": "Small intestine closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119888006,
+          "display": "Small intestine reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119892004,
+          "display": "Large intestine closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119915002,
+          "display": "Biliary tract incision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119916001,
+          "display": "Biliary tract excision (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119925007,
+          "display": "Biliary tract closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119926008,
+          "display": "Biliary tract reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119927004,
+          "display": "Gallbladder reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119928009,
+          "display": "Biliary tract repair (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119936000,
+          "display": "Pancreas closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 119937009,
+          "display": "Pancreas reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120167008,
+          "display": "Diaphragm closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120168003,
+          "display": "Diaphragm transposition (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120183008,
+          "display": "Peritoneum closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120184002,
+          "display": "Mesentery closure (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120186000,
+          "display": "Peritoneum reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 120188004,
+          "display": "Mesentery reconstruction (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12074006,
+          "display": "Ligation of gastric varices (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12092003,
+          "display": "Repair of rectal prolapse (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12102007,
+          "display": "Inversion of diverticulum of large intestine (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12324002,
+          "display": "Exploratory laparotomy with biopsy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12421006,
+          "display": "Closure of esophagostomy by thoracic approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12666009,
+          "display": "Cholecystocolostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12827003,
+          "display": "Excision of part of rectum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 128399009,
+          "display": "Anastomosis of gall bladder (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 128400002,
+          "display": "Anastomosis of stomach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 128401003,
+          "display": "Anastomosis of duodenum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 128406008,
+          "display": "Anastomosis of jejunum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 12959006,
+          "display": "Creation of subcutaneous tunnel with esophageal anastomosis (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13327002,
+          "display": "Partial colectomy by transanal approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1337002,
+          "display": "Colosigmoidostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 133871003,
+          "display": "Cecosigmoidostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13403003,
+          "display": "Pharyngoesophageal repair (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 13811001,
+          "display": "Take-down of gastric anastomosis (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1390003,
+          "display": "Laparoscopic-assisted sigmoid colectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14072009,
+          "display": "Total esophagectomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14335006,
+          "display": "Closure of esophageal fistula by thoracic approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14352005,
+          "display": "Incision and drainage of pseudocyst of pancreas (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14403007,
+          "display": "Ileotransversostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1457004,
+          "display": "Truncal vagotomy with pyloroplasty and gastrostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14599002,
+          "display": "Esophagojejunostomy by abdominal approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14622006,
+          "display": "Esophagoplasty by cervical approach (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14687003,
+          "display": "Choledochoenterostomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14690009,
+          "display": "Anastomosis of intestine, large-to-rectum (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 14759003,
+          "display": "Lysis of adhesions of gallbladder (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1501006,
+          "display": "Altemeier operation, perineal rectal pull-through (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15051002,
+          "display": "Repair of pancreas (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15213007,
+          "display": "Truncal vagotomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15257006,
+          "display": "Lobectomy of liver with partial excision of adjacent lobes (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 15457008,
+          "display": "Closure of cecosigmoidal fistula (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16079003,
+          "display": "Sauer-Bacon operation, abdominoperineal resection (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16224002,
+          "display": "Closure of hepatic duct fistula (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16280008,
+          "display": "Closure of gastric fistula (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 1645004,
+          "display": "Transduodenal sphincterotomy (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 16564004,
+          "display": "Hartmann operation, rectal resection (procedure)"
+        }
+      ],
+      "direct_transition": "NonQualifying_Procedure_Status",
+      "name": "NonQualifying_Surgery"
+    },
+    "Qualifying_Encounter": {
+      "type": "Encounter",
+      "encounter_class": "inpatient",
+      "reason": "",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 183452005,
+          "display": "Emergency hospital admission (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 32485007,
+          "display": "Hospital admission (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 8715000,
+          "display": "Hospital admission, elective (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 4525004,
+          "display": "Emergency department patient visit (procedure)"
+        }
+      ],
+      "name": "Qualifying_Encounter",
+      "distributed_transition": [
+        {
+          "transition": "Encounter_Status",
+          "distribution": 0.05
+        },
+        {
+          "transition": "Encounter_Period",
+          "distribution": 0.1
+        },
+        {
+          "transition": "Admission_without_Obstetrics",
+          "distribution": 0.7
+        },
+        {
+          "transition": "NonQualifying_Mental_Health",
+          "distribution": 0.05
+        },
+        {
+          "transition": "NonQualifying_Surgery",
+          "distribution": 0.05
+        },
+        {
+          "transition": "NonQualifying_Stroke",
+          "distribution": 0.05
+        }
+      ]
+    }
+  }
+}
