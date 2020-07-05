@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.math.ode.DerivativeException;
+import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
 import org.mitre.synthea.engine.Components.Attachment;
 import org.mitre.synthea.engine.Components.Exact;
 import org.mitre.synthea.engine.Components.ExactWithUnit;
@@ -695,6 +696,7 @@ public abstract class State implements Cloneable, Serializable {
     private String encounterClass;
     private List<Code> codes;
     private String reason;
+    private String encounterStatus;
 
     @Override
     public Encounter clone() {
@@ -703,6 +705,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.encounterClass = encounterClass;
       clone.reason = reason;
       clone.codes = codes;
+      clone.encounterStatus = encounterStatus;
       return clone;
     }
 
@@ -710,6 +713,9 @@ public abstract class State implements Cloneable, Serializable {
     public boolean process(Person person, long time) {
       if (wellness) {
         HealthRecord.Encounter encounter = person.record.currentEncounter(time);
+        if(encounterStatus != null) {
+            encounter.status = getEncounterStatus(encounterStatus);
+            }
         entry = encounter;
         String activeKey = EncounterModule.ACTIVE_WELLNESS_ENCOUNTER + " " + this.module.name;
         if (person.attributes.containsKey(activeKey)) {
@@ -729,6 +735,9 @@ public abstract class State implements Cloneable, Serializable {
         EncounterType type = EncounterType.fromString(encounterClass);
         HealthRecord.Encounter encounter = EncounterModule.createEncounter(person, time, type,
             ClinicianSpecialty.GENERAL_PRACTICE, null);
+        if(encounterStatus != null) {
+            encounter.status = getEncounterStatus(encounterStatus);
+            }
         entry = encounter;
         if (codes != null) {
           encounter.codes.addAll(codes);
@@ -757,6 +766,31 @@ public abstract class State implements Cloneable, Serializable {
         return true;
       }
     }
+    
+    private EncounterStatus getEncounterStatus(String status) {
+		switch (status) {
+		case "planned":
+			return EncounterStatus.PLANNED;
+		case "arrived":
+			return EncounterStatus.ARRIVED;
+		case "triaged":
+			return EncounterStatus.TRIAGED;
+		case "in-progress":
+			return EncounterStatus.INPROGRESS;
+		case "onleave":
+			return EncounterStatus.ONLEAVE;
+		case "finished":
+			return EncounterStatus.FINISHED;
+		case "cancelled":
+			return EncounterStatus.CANCELLED;
+		case "entered-in-error":
+			return EncounterStatus.ENTEREDINERROR;
+		case "unknown":
+			return EncounterStatus.UNKNOWN;
+		default:
+			return EncounterStatus.FINISHED;
+		}
+	}
 
     private void diagnosePastConditions(Person person, long time) {
       // reminder: history[0] is current state, history[size-1] is Initial

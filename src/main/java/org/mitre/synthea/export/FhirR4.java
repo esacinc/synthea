@@ -673,7 +673,7 @@ public class FhirR4 {
         .setReference(personEntry.getFullUrl())
         .setDisplay(patient.getNameFirstRep().getNameAsSingleString()));
 
-    encounterResource.setStatus(EncounterStatus.FINISHED);
+    encounterResource.setStatus(encounter.status);
     if (encounter.codes.isEmpty()) {
       // wellness encounter
       encounterResource.addType().addCoding().setCode("185349003")
