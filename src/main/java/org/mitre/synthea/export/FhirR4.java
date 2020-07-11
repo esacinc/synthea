@@ -66,7 +66,6 @@ import org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent;
 import org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent;
-import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Enumerations.DocumentReferenceStatus;
 import org.hl7.fhir.r4.model.ExplanationOfBenefit;
@@ -1622,7 +1621,7 @@ public class FhirR4 {
           "http://hl7.org/fhir/us/core/StructureDefinition/us-core-procedure");
       procedureResource.setMeta(meta);
     }
-    procedureResource.setStatus(ProcedureStatus.COMPLETED);
+    procedureResource.setStatus(procedure.status);
     procedureResource.setSubject(new Reference(personEntry.getFullUrl()));
     procedureResource.setEncounter(new Reference(encounterEntry.getFullUrl()));
     if (USE_US_CORE_IG) {
