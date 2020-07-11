@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.math.ode.DerivativeException;
 import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
+import org.hl7.fhir.r4.model.Procedure.ProcedureStatus;
 import org.mitre.synthea.engine.Components.Attachment;
 import org.mitre.synthea.engine.Components.Exact;
 import org.mitre.synthea.engine.Components.ExactWithUnit;
@@ -1360,6 +1361,7 @@ public abstract class State implements Cloneable, Serializable {
     private String reason;
     private RangeWithUnit<Long> duration;
     private String assignToAttribute;
+    private String procedureStatus;
 
     @Override
     public Procedure clone() {
@@ -1368,6 +1370,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.reason = reason;
       clone.duration = duration;
       clone.assignToAttribute = assignToAttribute;
+      clone.procedureStatus = procedureStatus;
       return clone;
     }
 
@@ -1378,7 +1381,9 @@ public abstract class State implements Cloneable, Serializable {
       entry = procedure;
       procedure.name = this.name;
       procedure.codes.addAll(codes);
-
+      if(procedureStatus != null) {
+    	  procedure.status = getProcedureStatus(procedureStatus);
+      }
       if (reason != null) {
         // "reason" is an attribute or stateName referencing a previous conditionOnset state
         if (person.attributes.containsKey(reason)) {
@@ -1398,6 +1403,7 @@ public abstract class State implements Cloneable, Serializable {
         double durationVal = person.rand(duration.low, duration.high);
         procedure.stop = procedure.start + Utilities.convertTime(duration.unit, (long) durationVal);
       }
+      
       // increment number of procedures by respective hospital
       Provider provider;
       if (person.getCurrentProvider(module.name) != null) {
@@ -1413,6 +1419,29 @@ public abstract class State implements Cloneable, Serializable {
       }
 
       return true;
+    }
+    
+    private ProcedureStatus getProcedureStatus(String status) {
+    	switch(status) {
+    	case "completed":
+    		return ProcedureStatus.COMPLETED;
+    	case "entered-in-error":
+    		return ProcedureStatus.ENTEREDINERROR;
+    	case "preparation":
+    		return ProcedureStatus.PREPARATION;
+    	case "in-progress":
+    		return ProcedureStatus.INPROGRESS;
+    	case "not-done":
+    		return ProcedureStatus.NOTDONE;
+    	case "on-hold":
+    		return ProcedureStatus.ONHOLD;
+    	case "stopped":
+    		return ProcedureStatus.STOPPED;
+    	case "unknown":
+    		return ProcedureStatus.UNKNOWN;
+    	default:
+    		return ProcedureStatus.COMPLETED;
+    	}
     }
   }
 

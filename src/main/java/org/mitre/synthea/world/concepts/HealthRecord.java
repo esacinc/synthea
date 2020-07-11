@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
+import org.hl7.fhir.r4.model.Procedure.ProcedureStatus;
 import org.mitre.synthea.helpers.Utilities;
 import org.mitre.synthea.world.agents.Clinician;
 import org.mitre.synthea.world.agents.Person;
@@ -264,6 +265,7 @@ public class HealthRecord implements Serializable {
     public List<Code> reasons;
     public Provider provider;
     public Clinician clinician;
+    public ProcedureStatus status;
 
     /**
      * Constructor for Procedure HealthRecord Entry.
@@ -272,6 +274,7 @@ public class HealthRecord implements Serializable {
       super(time, type);
       this.reasons = new ArrayList<Code>();
       this.stop = this.start + TimeUnit.MINUTES.toMillis(15);
+      this.status = ProcedureStatus.COMPLETED;
     }
   }
 
