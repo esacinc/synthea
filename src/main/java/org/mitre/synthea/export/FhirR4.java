@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.AllergyIntolerance;
 import org.hl7.fhir.r4.model.AllergyIntolerance.AllergyIntoleranceCategory;
@@ -698,6 +699,12 @@ public class FhirR4 {
     if (encounter.reason != null) {
       encounterResource.addReasonCode().addCoding().setCode(encounter.reason.code)
           .setDisplay(encounter.reason.display).setSystem(SNOMED_URI);
+    }
+
+    if (encounter.diagnosis != null) {
+      encounterResource.addDiagnosis().setCondition(new Reference()
+              .setType(encounter.diagnosis.fullUrl)
+              .setDisplay(encounter.diagnosis.codes.get(0).display));
     }
 
     if (encounter.provider != null) {
@@ -1396,6 +1403,12 @@ public class FhirR4 {
     BundleEntryComponent conditionEntry = newEntry(bundle, conditionResource);
 
     condition.fullUrl = conditionEntry.getFullUrl();
+
+    org.hl7.fhir.r4.model.Encounter encounterResource = (org.hl7.fhir.r4.model.Encounter) encounterEntry.getResource();
+	if (CollectionUtils.isNotEmpty(encounterResource.getDiagnosis())
+			&& code.display.equalsIgnoreCase(encounterResource.getDiagnosis().get(0).getCondition().getDisplay())) {
+		encounterResource.getDiagnosis().get(0).getCondition().setType(conditionEntry.getFullUrl());
+	}
 
     return conditionEntry;
   }

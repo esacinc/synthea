@@ -506,6 +506,7 @@ public class HealthRecord implements Serializable {
     public List<Supply> supplies;
     public Claim claim; // for now assume 1 claim per encounter
     public Code reason;
+    public Entry diagnosis;
     public Code discharge;
     public Provider provider;
     public Clinician clinician;
