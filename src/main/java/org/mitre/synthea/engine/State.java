@@ -16,6 +16,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.math.ode.DerivativeException;
+import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
+import org.hl7.fhir.r4.model.Procedure.ProcedureStatus;
 import org.mitre.synthea.engine.Components.Attachment;
 import org.mitre.synthea.engine.Components.Exact;
 import org.mitre.synthea.engine.Components.ExactWithUnit;
@@ -695,6 +697,7 @@ public abstract class State implements Cloneable, Serializable {
     private String encounterClass;
     private List<Code> codes;
     private String reason;
+    private String encounterStatus;
 
     @Override
     public Encounter clone() {
@@ -703,6 +706,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.encounterClass = encounterClass;
       clone.reason = reason;
       clone.codes = codes;
+      clone.encounterStatus = encounterStatus;
       return clone;
     }
 
@@ -710,6 +714,9 @@ public abstract class State implements Cloneable, Serializable {
     public boolean process(Person person, long time) {
       if (wellness) {
         HealthRecord.Encounter encounter = person.record.currentEncounter(time);
+        if(encounterStatus != null) {
+            encounter.status = getEncounterStatus(encounterStatus);
+            }
         entry = encounter;
         String activeKey = EncounterModule.ACTIVE_WELLNESS_ENCOUNTER + " " + this.module.name;
         if (person.attributes.containsKey(activeKey)) {
@@ -729,6 +736,9 @@ public abstract class State implements Cloneable, Serializable {
         EncounterType type = EncounterType.fromString(encounterClass);
         HealthRecord.Encounter encounter = EncounterModule.createEncounter(person, time, type,
             ClinicianSpecialty.GENERAL_PRACTICE, null);
+        if(encounterStatus != null) {
+            encounter.status = getEncounterStatus(encounterStatus);
+            }
         entry = encounter;
         if (codes != null) {
           encounter.codes.addAll(codes);
@@ -757,6 +767,31 @@ public abstract class State implements Cloneable, Serializable {
         return true;
       }
     }
+    
+    private EncounterStatus getEncounterStatus(String status) {
+		switch (status) {
+		case "planned":
+			return EncounterStatus.PLANNED;
+		case "arrived":
+			return EncounterStatus.ARRIVED;
+		case "triaged":
+			return EncounterStatus.TRIAGED;
+		case "in-progress":
+			return EncounterStatus.INPROGRESS;
+		case "onleave":
+			return EncounterStatus.ONLEAVE;
+		case "finished":
+			return EncounterStatus.FINISHED;
+		case "cancelled":
+			return EncounterStatus.CANCELLED;
+		case "entered-in-error":
+			return EncounterStatus.ENTEREDINERROR;
+		case "unknown":
+			return EncounterStatus.UNKNOWN;
+		default:
+			return EncounterStatus.FINISHED;
+		}
+	}
 
     private void diagnosePastConditions(Person person, long time) {
       // reminder: history[0] is current state, history[size-1] is Initial
@@ -1326,6 +1361,7 @@ public abstract class State implements Cloneable, Serializable {
     private String reason;
     private RangeWithUnit<Long> duration;
     private String assignToAttribute;
+    private String procedureStatus;
 
     @Override
     public Procedure clone() {
@@ -1334,6 +1370,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.reason = reason;
       clone.duration = duration;
       clone.assignToAttribute = assignToAttribute;
+      clone.procedureStatus = procedureStatus;
       return clone;
     }
 
@@ -1344,7 +1381,9 @@ public abstract class State implements Cloneable, Serializable {
       entry = procedure;
       procedure.name = this.name;
       procedure.codes.addAll(codes);
-
+      if(procedureStatus != null) {
+    	  procedure.status = getProcedureStatus(procedureStatus);
+      }
       if (reason != null) {
         // "reason" is an attribute or stateName referencing a previous conditionOnset state
         if (person.attributes.containsKey(reason)) {
@@ -1364,6 +1403,7 @@ public abstract class State implements Cloneable, Serializable {
         double durationVal = person.rand(duration.low, duration.high);
         procedure.stop = procedure.start + Utilities.convertTime(duration.unit, (long) durationVal);
       }
+      
       // increment number of procedures by respective hospital
       Provider provider;
       if (person.getCurrentProvider(module.name) != null) {
@@ -1379,6 +1419,29 @@ public abstract class State implements Cloneable, Serializable {
       }
 
       return true;
+    }
+    
+    private ProcedureStatus getProcedureStatus(String status) {
+    	switch(status) {
+    	case "completed":
+    		return ProcedureStatus.COMPLETED;
+    	case "entered-in-error":
+    		return ProcedureStatus.ENTEREDINERROR;
+    	case "preparation":
+    		return ProcedureStatus.PREPARATION;
+    	case "in-progress":
+    		return ProcedureStatus.INPROGRESS;
+    	case "not-done":
+    		return ProcedureStatus.NOTDONE;
+    	case "on-hold":
+    		return ProcedureStatus.ONHOLD;
+    	case "stopped":
+    		return ProcedureStatus.STOPPED;
+    	case "unknown":
+    		return ProcedureStatus.UNKNOWN;
+    	default:
+    		return ProcedureStatus.COMPLETED;
+    	}
     }
   }
 
