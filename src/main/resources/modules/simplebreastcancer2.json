@@ -1,0 +1,278 @@
+{
+  "name": "SimpleBreastCancer2",
+  "remarks": [
+    "Simple model for Breast Cancer measure CMS125"
+  ],
+  "states": {
+    "Initial": {
+      "type": "Initial",
+      "name": "Initial",
+      "direct_transition": "MeasurementPeriodStart"
+    },
+    "Terminal": {
+      "type": "Terminal",
+      "name": "Terminal"
+    },
+    "Female": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Gender",
+        "gender": "F"
+      },
+      "direct_transition": "PopulationAge",
+      "name": "Female"
+    },
+    "PopulationAge": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "And",
+        "conditions": [
+          {
+            "condition_type": "Age",
+            "operator": ">=",
+            "quantity": "51",
+            "unit": "years",
+            "value": 0
+          },
+          {
+            "condition_type": "Age",
+            "operator": "<=",
+            "quantity": "74",
+            "unit": "years",
+            "value": 0
+          }
+        ]
+      },
+      "direct_transition": "Qualified Encounter_2019",
+      "name": "PopulationAge"
+    },
+    "MammogramDiagnosticReport": {
+      "type": "DiagnosticReport",
+      "codes": [
+        {
+          "system": "LOINC",
+          "code": "24605-8",
+          "display": "MG Breast Diagnostic"
+        },
+        {
+          "system": "LOINC",
+          "code": "24606-6",
+          "display": "MG Breast Screening"
+        }
+      ],
+      "observations": [],
+      "direct_transition": "Terminal",
+      "name": "MammogramDiagnosticReport"
+    },
+    "Unilateral Mastectomy Procedure 1": {
+      "type": "Procedure",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 172043006,
+          "display": "Simple mastectomy (procedure)"
+        }
+      ],
+      "duration": {
+        "low": 30,
+        "high": 240,
+        "unit": "minutes"
+      },
+      "distributed_transition": [
+        {
+          "transition": "Unilateral_Mastectomy_Procedure 2",
+          "distribution": 0.9
+        },
+        {
+          "transition": "Terminal",
+          "distribution": 0.1
+        }
+      ],
+      "name": "Unilateral Mastectomy Procedure 1"
+    },
+    "Unilateral_Mastectomy_Procedure 2": {
+      "type": "Procedure",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 172043006,
+          "display": "Simple mastectomy (procedure)"
+        }
+      ],
+      "duration": {
+        "low": 30,
+        "high": 240,
+        "unit": "minutes"
+      },
+      "direct_transition": "Terminal",
+      "name": "Unilateral_Mastectomy_Procedure 2"
+    },
+    "Right Mastectomy": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "text",
+      "target_encounter": "",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 429242008,
+          "display": "History of right mastectomy (situation)"
+        }
+      ],
+      "distributed_transition": [
+        {
+          "transition": "Left Mastectomy",
+          "distribution": 0.9
+        },
+        {
+          "transition": "Terminal",
+          "distribution": 0.1
+        }
+      ],
+      "name": "Right Mastectomy"
+    },
+    "Left Mastectomy": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "",
+      "target_encounter": "",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 429009003,
+          "display": "History of left mastectomy (situation)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "name": "Left Mastectomy"
+    },
+    "History Bilateral Mastectomy": {
+      "type": "ConditionOnset",
+      "assign_to_attribute": "",
+      "target_encounter": "",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 428529004,
+          "display": "History of bilateral mastectomy (situation)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "name": "History Bilateral Mastectomy"
+    },
+    "Bilateral Mastectomy Procedure": {
+      "type": "Procedure",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 14693006,
+          "display": "Bilateral subcutaneous mammectomy (procedure)"
+        }
+      ],
+      "duration": {
+        "low": 30,
+        "high": 240,
+        "unit": "minutes"
+      },
+      "direct_transition": "Terminal",
+      "name": "Bilateral Mastectomy Procedure"
+    },
+    "InitialPopulation": {
+      "type": "Simple",
+      "direct_transition": "Denominator",
+      "name": "InitialPopulation"
+    },
+    "Denominator": {
+      "type": "Simple",
+      "distributed_transition": [
+        {
+          "transition": "Numerator",
+          "distribution": 0.9
+        },
+        {
+          "transition": "DenominatorException",
+          "distribution": 0.1
+        }
+      ],
+      "name": "Denominator"
+    },
+    "Numerator": {
+      "type": "Simple",
+      "direct_transition": "MammogramDiagnosticReport",
+      "name": "Numerator"
+    },
+    "DenominatorException": {
+      "type": "Simple",
+      "distributed_transition": [
+        {
+          "transition": "Bilateral Mastectomy Procedure",
+          "distribution": 0.2
+        },
+        {
+          "transition": "History Bilateral Mastectomy",
+          "distribution": 0.2
+        },
+        {
+          "transition": "Right Mastectomy",
+          "distribution": 0.2
+        },
+        {
+          "transition": "Unilateral Mastectomy Procedure 1",
+          "distribution": 0.2
+        },
+        {
+          "transition": "HospiceEncounter",
+          "distribution": 0.2
+        }
+      ],
+      "name": "DenominatorException"
+    },
+    "Qualified Encounter_2019": {
+      "type": "CallSubmodule",
+      "submodule": "qualified_encounter/AdultOutpatientEncounters",
+      "direct_transition": "InitialPopulation",
+      "name": "Qualified Encounter_2019"
+    },
+    "HospiceEncounter": {
+      "type": "CallSubmodule",
+      "submodule": "qualified_encounter/HospiceEncounter",
+      "direct_transition": "Terminal",
+      "name": "HospiceEncounter"
+    },
+    "MeasurementPeriodStart": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Date",
+        "operator": ">",
+        "date": {
+          "year": 2019,
+          "month": 1,
+          "day": 1,
+          "hour": 12,
+          "minute": 0,
+          "second": 0,
+          "millisecond": 0
+        }
+      },
+      "direct_transition": "MeasurementPeriodEnd",
+      "name": "MeasurementPeriodStart"
+    },
+    "MeasurementPeriodEnd": {
+      "type": "Guard",
+      "allow": {
+        "condition_type": "Date",
+        "operator": "<",
+        "value": 0,
+        "date": {
+          "year": 2019,
+          "month": 12,
+          "day": 31,
+          "hour": 0,
+          "minute": 59,
+          "second": 59,
+          "millisecond": 0
+        }
+      },
+      "direct_transition": "Female",
+      "name": "MeasurementPeriodEnd"
+    }
+  }
+}

@@ -1,0 +1,92 @@
+{
+  "name": "HospiceEncounter",
+  "remarks": [
+    "A blank module"
+  ],
+  "states": {
+    "Initial": {
+      "type": "Initial",
+      "distributed_transition": [
+        {
+          "transition": "EncounterInpatient",
+          "distribution": 0.5
+        },
+        {
+          "transition": "HospiceCareAmb",
+          "distribution": 0.5
+        }
+      ]
+    },
+    "Terminal": {
+      "type": "Terminal"
+    },
+    "EncounterInpatient": {
+      "type": "Encounter",
+      "encounter_class": "ambulatory",
+      "reason": "Select Condition/Enter Attribute",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 183452005,
+          "display": "Emergency hospital admission (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 32485007,
+          "display": "Hospital admission (procedure)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 8715000,
+          "display": "Hospital admission, elective (procedure)"
+        }
+      ],
+      "encounter_status": "finished",
+      "distributed_transition": [
+        {
+          "transition": "EncounterDischarge2",
+          "distribution": 0.5
+        },
+        {
+          "transition": "EncounterDischarge1",
+          "distribution": 0.5
+        }
+      ]
+    },
+    "HospiceCareAmb": {
+      "type": "Procedure",
+      "codes": [
+        {
+          "system": "SNOMED-CT",
+          "code": 385763009,
+          "display": "Hospice care (regime/therapy)"
+        },
+        {
+          "system": "SNOMED-CT",
+          "code": 385765002,
+          "display": "Hospice care management (procedure)"
+        }
+      ],
+      "direct_transition": "Terminal",
+      "reason": "Select Condition/Enter Attribute"
+    },
+    "EncounterDischarge1": {
+      "type": "EncounterEnd",
+      "direct_transition": "Terminal",
+      "discharge_disposition": {
+        "system": "SNOMED-CT",
+        "code": 428361000124107,
+        "display": "Discharge to home for hospice care (procedure)"
+      }
+    },
+    "EncounterDischarge2": {
+      "type": "EncounterEnd",
+      "direct_transition": "Terminal",
+      "discharge_disposition": {
+        "system": "SNOMED-CT",
+        "code": 428371000124100,
+        "display": "Discharge to healthcare facility for hospice care (procedure)"
+      }
+    }
+  }
+}
