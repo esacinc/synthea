@@ -751,13 +751,15 @@ public abstract class State implements Cloneable, Serializable {
         if (reason != null) {
           if (person.attributes.containsKey(reason)) {
             Entry condition = (Entry) person.attributes.get(reason);
-            encounter.reason = condition.codes.get(0);
+            //encounter.reason = condition.codes.get(0);
+            encounter.diagnosis = condition;
           } else if (person.hadPriorState(reason)) {
             // loop through the present conditions, the condition "name" will match
             // the name of the ConditionOnset state (aka "reason")
             for (Entry entry : person.record.present.values()) {
               if (reason.equals(entry.name)) {
-                encounter.reason = entry.codes.get(0);
+                //encounter.reason = entry.codes.get(0);
+                encounter.diagnosis = entry;
                 break;
               }
             }
