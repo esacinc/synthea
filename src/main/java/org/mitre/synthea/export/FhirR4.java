@@ -1400,8 +1400,13 @@ public class FhirR4 {
       status.getCodingFirstRep().setCode("resolved");
     }
 
-    BundleEntryComponent conditionEntry = newEntry(bundle, conditionResource);
+    if(condition.bodySite != null) {
+      CodeableConcept bodySite = mapCodeToCodeableConcept(condition.bodySite, SNOMED_URI);
+      conditionResource.addBodySite(bodySite);
+      }
 
+    BundleEntryComponent conditionEntry = newEntry(bundle, conditionResource);
+    
     condition.fullUrl = conditionEntry.getFullUrl();
 
     org.hl7.fhir.r4.model.Encounter encounterResource = (org.hl7.fhir.r4.model.Encounter) encounterEntry.getResource();
