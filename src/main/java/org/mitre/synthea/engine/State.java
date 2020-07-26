@@ -925,12 +925,14 @@ public abstract class State implements Cloneable, Serializable {
     protected List<Code> codes;
     protected String assignToAttribute;
     protected String targetEncounter;
+    protected Code bodySite;
 
     public OnsetState clone() {
       OnsetState clone = (OnsetState) super.clone();
       clone.codes = codes;
       clone.assignToAttribute = assignToAttribute;
       clone.targetEncounter = targetEncounter;
+      clone.bodySite = bodySite;
       return clone;
     }
 
@@ -947,7 +949,7 @@ public abstract class State implements Cloneable, Serializable {
         // which will be replaced if the thing is diagnosed
         HealthRecord.Entry codedEntry = person.record.new Entry(time, codes.get(0).code);
         codedEntry.codes.addAll(codes);
-
+        codedEntry.bodySite = bodySite;
         person.attributes.put(assignToAttribute, codedEntry);
       }
       return true;
@@ -988,7 +990,9 @@ public abstract class State implements Cloneable, Serializable {
       if (assignToAttribute != null) {
         person.attributes.put(assignToAttribute, entry);
       }
-
+      if (bodySite != null) {
+        entry.bodySite = bodySite;
+      }
       diagnosed = true;
     }
   }
