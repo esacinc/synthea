@@ -50,6 +50,7 @@ import org.mitre.synthea.world.concepts.HealthRecord.Code;
 import org.mitre.synthea.world.concepts.HealthRecord.EncounterType;
 import org.mitre.synthea.world.concepts.HealthRecord.Entry;
 import org.mitre.synthea.world.concepts.HealthRecord.Medication;
+import org.mitre.synthea.world.concepts.HealthRecord.Period;
 import org.mitre.synthea.world.concepts.HealthRecord.Report;
 import org.simulator.math.odes.MultiTable;
 
@@ -698,6 +699,8 @@ public abstract class State implements Cloneable, Serializable {
     private List<Code> codes;
     private String reason;
     private String encounterStatus;
+    private RangeWithUnit<Long> duration;
+    private Period period;
 
     @Override
     public Encounter clone() {
@@ -707,6 +710,8 @@ public abstract class State implements Cloneable, Serializable {
       clone.reason = reason;
       clone.codes = codes;
       clone.encounterStatus = encounterStatus;
+      clone.duration = duration;
+      clone.period = period;
       return clone;
     }
 
@@ -717,6 +722,8 @@ public abstract class State implements Cloneable, Serializable {
         if(encounterStatus != null) {
             encounter.status = getEncounterStatus(encounterStatus);
             }
+        encounter.range = duration;
+        encounter.period = period;        
         entry = encounter;
         String activeKey = EncounterModule.ACTIVE_WELLNESS_ENCOUNTER + " " + this.module.name;
         if (person.attributes.containsKey(activeKey)) {
@@ -739,6 +746,8 @@ public abstract class State implements Cloneable, Serializable {
         if(encounterStatus != null) {
             encounter.status = getEncounterStatus(encounterStatus);
             }
+        encounter.range = duration;
+        encounter.period = period;
         entry = encounter;
         if (codes != null) {
           encounter.codes.addAll(codes);

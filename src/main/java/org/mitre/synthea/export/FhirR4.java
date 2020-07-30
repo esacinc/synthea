@@ -9,6 +9,8 @@ import com.google.gson.JsonObject;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -66,6 +68,7 @@ import org.hl7.fhir.r4.model.DocumentReference;
 import org.hl7.fhir.r4.model.DocumentReference.DocumentReferenceContextComponent;
 import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent;
+import org.hl7.fhir.r4.model.Duration;
 import org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Enumerations.DocumentReferenceStatus;
@@ -691,10 +694,29 @@ public class FhirR4 {
     classCode.setCode(EncounterType.fromString(encounter.type).code());
     classCode.setSystem("http://terminology.hl7.org/CodeSystem/v3-ActCode");
     encounterResource.setClass_(classCode);
-    encounterResource
-        .setPeriod(new Period()
-            .setStart(new Date(encounter.start))
-            .setEnd(new Date(encounter.stop)));
+    
+	encounterResource.setPeriod(new Period().setStart(new Date(encounter.start)).setEnd(new Date(encounter.stop)));
+	//If the input contains period information then override with the input values
+	if (encounter.period != null) {
+		try {
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			Date start = inputFormat.parse(encounter.period.getStart());
+			Date end = inputFormat.parse(encounter.period.getEnd());
+			encounterResource.setPeriod(new Period().setStart(start).setEnd(end));
+		} catch (ParseException e) {
+			System.out.println("Exception occured while converting Period Dates:"+e.getMessage());
+		}
+	}
+	
+	if (encounter.range != null) {
+		Duration duration = new Duration();
+		duration.setValue(encounter.range.low);
+		duration.setCode(encounter.range.unit);
+		duration.setSystem(UNITSOFMEASURE_URI);
+		duration.setUnit(encounter.range.unit);
+		encounterResource.setLength(duration);
+	}
+   
 
     if (encounter.reason != null) {
       encounterResource.addReasonCode().addCoding().setCode(encounter.reason.code)
