@@ -24,10 +24,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.hl7.fhir.r4.model.Encounter.EncounterStatus;
 import org.hl7.fhir.r4.model.Procedure.ProcedureStatus;
+import org.mitre.synthea.engine.Components.RangeWithUnit;
 import org.mitre.synthea.helpers.Utilities;
 import org.mitre.synthea.world.agents.Clinician;
 import org.mitre.synthea.world.agents.Person;
 import org.mitre.synthea.world.agents.Provider;
+import org.mitre.synthea.world.concepts.HealthRecord.Period;
 
 /**
  * HealthRecord contains all the coded entries in a person's health record. This
@@ -114,6 +116,46 @@ public class HealthRecord implements Serializable {
     }
   }
 
+  
+	/**
+	 * HealthRecord.Period represents a period with start and end
+	 * 
+	 */
+	public class Period implements Serializable {
+
+		private String start;
+		private String end;
+
+		/**
+		 * Create a new Period.
+		 *
+		 * @param start the period start date time (yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+		 * @param end   the period end date time (yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+		 *
+		 */
+		public Period(String start, String end) {
+			this.start = start;
+			this.end = end;
+		}
+
+		public String getStart() {
+			return start;
+		}
+
+		public void setStart(String start) {
+			this.start = start;
+		}
+
+		public String getEnd() {
+			return end;
+		}
+
+		public void setEnd(String end) {
+			this.end = end;
+		}
+
+	}
+  
   /**
    * All things within a HealthRecord are instances of Entry. For example,
    * Observations, Reports, Medications, etc. All Entries have a name, start and
@@ -516,6 +558,8 @@ public class HealthRecord implements Serializable {
     public boolean chronicMedsRenewed;
     public String clinicalNote;
     public EncounterStatus status;
+    public RangeWithUnit<Long> range;
+    public Period period;
 
     /**
      * Construct an encounter.
