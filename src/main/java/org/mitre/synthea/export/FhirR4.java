@@ -167,6 +167,7 @@ public class FhirR4 {
   private static final String UNITSOFMEASURE_URI = "http://unitsofmeasure.org";
   private static final String DICOM_DCM_URI = "http://dicom.nema.org/resources/ontology/DCM";
   private static final String MEDIA_TYPE_URI = "http://terminology.hl7.org/CodeSystem/media-type";
+  private static final String CS_URI = "http://terminology.hl7.org/CodeSystem/condition-clinical";
 
   @SuppressWarnings("rawtypes")
   private static final Map raceEthnicityCodes = loadRaceEthnicityCodes();
@@ -1426,6 +1427,12 @@ public class FhirR4 {
       CodeableConcept bodySite = mapCodeToCodeableConcept(condition.bodySite, SNOMED_URI);
       conditionResource.addBodySite(bodySite);
       }
+    
+    if(condition.clinicalStatus != null) {
+    	Code csCode = new Code(CS_URI, condition.clinicalStatus, null);
+    	CodeableConcept clinicalStatus = mapCodeToCodeableConcept(csCode, CS_URI);
+        conditionResource.setClinicalStatus(clinicalStatus);
+    }
 
     BundleEntryComponent conditionEntry = newEntry(bundle, conditionResource);
     
