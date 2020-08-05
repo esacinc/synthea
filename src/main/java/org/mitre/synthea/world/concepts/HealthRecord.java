@@ -172,7 +172,7 @@ public class HealthRecord implements Serializable {
     public List<Code> codes;
     private BigDecimal cost;
     public Code bodySite;
-    
+    public String clinicalStatus;
     /**
      * Constructor for Entry.
      */
