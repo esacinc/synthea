@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -70,6 +71,8 @@ import org.hl7.fhir.r4.model.Dosage;
 import org.hl7.fhir.r4.model.Dosage.DosageDoseAndRateComponent;
 import org.hl7.fhir.r4.model.Duration;
 import org.hl7.fhir.r4.model.Encounter.EncounterHospitalizationComponent;
+import org.hl7.fhir.r4.model.Encounter.EncounterLocationComponent;
+import org.hl7.fhir.r4.model.Encounter.EncounterLocationStatus;
 import org.hl7.fhir.r4.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.r4.model.Enumerations.DocumentReferenceStatus;
 import org.hl7.fhir.r4.model.ExplanationOfBenefit;
@@ -699,14 +702,19 @@ public class FhirR4 {
 	encounterResource.setPeriod(new Period().setStart(new Date(encounter.start)).setEnd(new Date(encounter.stop)));
 	//If the input contains period information then override with the input values
 	if (encounter.period != null) {
-		try {
-			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-			Date start = inputFormat.parse(encounter.period.getStart());
-			Date end = inputFormat.parse(encounter.period.getEnd());
-			encounterResource.setPeriod(new Period().setStart(start).setEnd(end));
-		} catch (ParseException e) {
-			System.out.println("Exception occured while converting Period Dates:"+e.getMessage());
-		}
+		encounterResource.setPeriod(getPeriod(encounter.period.getStart(), encounter.period.getEnd()));
+	}
+	
+	// set the location
+	if (encounter.location != null) {
+		EncounterLocationComponent encounterLocationComponent = new EncounterLocationComponent();
+		Reference reference = new Reference();
+		reference.setDisplay(encounter.location.getLocationDisplay());
+		encounterLocationComponent.setLocation(reference);
+		encounterLocationComponent.setStatus(EncounterLocationStatus.fromCode(encounter.location.getLocationStatus()));
+		encounterLocationComponent.setPeriod(getPeriod(encounter.location.getLocationPeriod().getStart(),
+				encounter.location.getLocationPeriod().getEnd()));
+		encounterResource.setLocation(Arrays.asList(encounterLocationComponent));
 	}
 	
 	if (encounter.range != null) {
@@ -800,6 +808,27 @@ public class FhirR4 {
     }
     return entry;
   }
+  
+  /**
+	 * Fill the Period from start and end time entries.
+	 * 
+	 * start the period start date time (yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+	 * end   the period end date time (yyyy-MM-dd'T'HH:mm:ss.SSS'Z')
+	 * Period if input is in correct format, otherwise null.
+	 * 
+	 */
+	private static Period getPeriod(String start, String end) {
+		try {
+			SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+			Date startPeriod = inputFormat.parse(start);
+			Date endPeriod = inputFormat.parse(end);
+			return new Period().setStart(startPeriod).setEnd(endPeriod);
+
+		} catch (ParseException e) {
+			return null;
+		}
+
+	}
 
   /**
    * Find the provider entry in this bundle, and return the associated "fullUrl" attribute.

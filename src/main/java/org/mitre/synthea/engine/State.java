@@ -49,6 +49,7 @@ import org.mitre.synthea.world.concepts.HealthRecord.CarePlan;
 import org.mitre.synthea.world.concepts.HealthRecord.Code;
 import org.mitre.synthea.world.concepts.HealthRecord.EncounterType;
 import org.mitre.synthea.world.concepts.HealthRecord.Entry;
+import org.mitre.synthea.world.concepts.HealthRecord.Location;
 import org.mitre.synthea.world.concepts.HealthRecord.Medication;
 import org.mitre.synthea.world.concepts.HealthRecord.Period;
 import org.mitre.synthea.world.concepts.HealthRecord.Report;
@@ -701,6 +702,7 @@ public abstract class State implements Cloneable, Serializable {
     private String encounterStatus;
     private RangeWithUnit<Long> duration;
     private Period period;
+    private Location location;
 
     @Override
     public Encounter clone() {
@@ -712,6 +714,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.encounterStatus = encounterStatus;
       clone.duration = duration;
       clone.period = period;
+      clone.location = location;
       return clone;
     }
 
@@ -723,7 +726,8 @@ public abstract class State implements Cloneable, Serializable {
             encounter.status = getEncounterStatus(encounterStatus);
             }
         encounter.range = duration;
-        encounter.period = period;        
+        encounter.period = period;     
+        encounter.location = location;
         entry = encounter;
         String activeKey = EncounterModule.ACTIVE_WELLNESS_ENCOUNTER + " " + this.module.name;
         if (person.attributes.containsKey(activeKey)) {
@@ -748,6 +752,7 @@ public abstract class State implements Cloneable, Serializable {
             }
         encounter.range = duration;
         encounter.period = period;
+        encounter.location = location;
         entry = encounter;
         if (codes != null) {
           encounter.codes.addAll(codes);
