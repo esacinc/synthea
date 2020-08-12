@@ -215,6 +215,7 @@ public class HealthRecord implements Serializable {
     private BigDecimal cost;
     public Code bodySite;
     public String clinicalStatus;
+    public int rank;
     /**
      * Constructor for Entry.
      */

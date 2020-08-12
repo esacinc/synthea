@@ -941,6 +941,7 @@ public abstract class State implements Cloneable, Serializable {
     protected String targetEncounter;
     protected Code bodySite;
     protected String clinicalStatus;
+    protected int rank;
 
     public OnsetState clone() {
       OnsetState clone = (OnsetState) super.clone();
@@ -949,6 +950,7 @@ public abstract class State implements Cloneable, Serializable {
       clone.targetEncounter = targetEncounter;
       clone.bodySite = bodySite;
       clone.clinicalStatus = clinicalStatus;
+      clone.rank = rank;
       return clone;
     }
 
@@ -966,6 +968,7 @@ public abstract class State implements Cloneable, Serializable {
         HealthRecord.Entry codedEntry = person.record.new Entry(time, codes.get(0).code);
         codedEntry.codes.addAll(codes);
         codedEntry.bodySite = bodySite;
+        codedEntry.rank = rank;
         codedEntry.clinicalStatus = clinicalStatus;
         person.attributes.put(assignToAttribute, codedEntry);
       }
@@ -1013,6 +1016,7 @@ public abstract class State implements Cloneable, Serializable {
       if(clinicalStatus != null) {
     	  entry.clinicalStatus = clinicalStatus;
       }
+      entry.rank = rank;
       diagnosed = true;
     }
   }
