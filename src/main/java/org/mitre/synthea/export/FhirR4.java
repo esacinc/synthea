@@ -732,11 +732,6 @@ public class FhirR4 {
           .setDisplay(encounter.reason.display).setSystem(SNOMED_URI);
     }
 
-    if (encounter.diagnosis != null) {
-      encounterResource.addDiagnosis().setCondition(new Reference()
-              .setType(encounter.diagnosis.fullUrl)
-              .setDisplay(encounter.diagnosis.codes.get(0).display));
-    }
 
     if (encounter.provider != null) {
       String providerFullUrl = findProviderUrl(encounter.provider, bundle);
@@ -1468,10 +1463,12 @@ public class FhirR4 {
     condition.fullUrl = conditionEntry.getFullUrl();
 
     org.hl7.fhir.r4.model.Encounter encounterResource = (org.hl7.fhir.r4.model.Encounter) encounterEntry.getResource();
-	if (CollectionUtils.isNotEmpty(encounterResource.getDiagnosis())
-			&& code.display.equalsIgnoreCase(encounterResource.getDiagnosis().get(0).getCondition().getDisplay())) {
-		encounterResource.getDiagnosis().get(0).getCondition().setType(conditionEntry.getFullUrl());
-	}
+    org.hl7.fhir.r4.model.Encounter.DiagnosisComponent diagnosisComponent = new org.hl7.fhir.r4.model.Encounter.DiagnosisComponent();
+    diagnosisComponent.setCondition(new Reference().setReference("Condition/"+condition.name));
+    if(condition.rank > 0) {
+    diagnosisComponent.setRank(condition.rank);
+    }
+    encounterResource.addDiagnosis(diagnosisComponent);
 
     return conditionEntry;
   }
