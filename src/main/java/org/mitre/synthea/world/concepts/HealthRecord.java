@@ -156,6 +156,48 @@ public class HealthRecord implements Serializable {
 
 	}
   
+	
+	/**
+	 * HealthRecord.Location represents a location
+	 * 
+	 */
+	public class Location implements Serializable {
+
+		private String locationDisplay;
+		private String locationStatus;
+		private Period locationPeriod;
+
+		public Location(String locationDisplay, String locationStatus, Period locationPeriod) {
+			this.locationDisplay = locationDisplay;
+			this.locationStatus = locationStatus;
+			this.locationPeriod = locationPeriod;
+		}
+
+		public String getLocationDisplay() {
+			return locationDisplay;
+		}
+
+		public void setLocationDisplay(String locationDisplay) {
+			this.locationDisplay = locationDisplay;
+		}
+
+		public String getLocationStatus() {
+			return locationStatus;
+		}
+
+		public void setLocationStatus(String locationStatus) {
+			this.locationStatus = locationStatus;
+		}
+
+		public Period getLocationPeriod() {
+			return locationPeriod;
+		}
+
+		public void setLocationPeriod(Period locationPeriod) {
+			this.locationPeriod = locationPeriod;
+		}	
+	}
+	
   /**
    * All things within a HealthRecord are instances of Entry. For example,
    * Observations, Reports, Medications, etc. All Entries have a name, start and
@@ -560,6 +602,7 @@ public class HealthRecord implements Serializable {
     public EncounterStatus status;
     public RangeWithUnit<Long> range;
     public Period period;
+    public Location location;
 
     /**
      * Construct an encounter.
